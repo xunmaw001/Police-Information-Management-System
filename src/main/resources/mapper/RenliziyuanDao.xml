@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.RenliziyuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.renliziyuan_name as renliziyuanName
+        ,a.renliziyuan_phone as renliziyuanPhone
+        ,a.renliziyuan_id_number as renliziyuanIdNumber
+        ,a.renliziyuan_photo as renliziyuanPhoto
+        ,a.sex_types as sexTypes
+        ,a.renliziyuan_email as renliziyuanEmail
+        ,a.renliziyuan_delete as renliziyuanDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.RenliziyuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM renliziyuan  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.renliziyuanName != '' and params.renliziyuanName != null and params.renliziyuanName != 'null' ">
+                and a.renliziyuan_name like CONCAT('%',#{params.renliziyuanName},'%')
+            </if>
+            <if test=" params.renliziyuanPhone != '' and params.renliziyuanPhone != null and params.renliziyuanPhone != 'null' ">
+                and a.renliziyuan_phone like CONCAT('%',#{params.renliziyuanPhone},'%')
+            </if>
+            <if test=" params.renliziyuanIdNumber != '' and params.renliziyuanIdNumber != null and params.renliziyuanIdNumber != 'null' ">
+                and a.renliziyuan_id_number like CONCAT('%',#{params.renliziyuanIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.renliziyuanEmail != '' and params.renliziyuanEmail != null and params.renliziyuanEmail != 'null' ">
+                and a.renliziyuan_email like CONCAT('%',#{params.renliziyuanEmail},'%')
+            </if>
+            <if test="params.renliziyuanDeleteStart != null and params.renliziyuanDeleteStart != ''">
+                <![CDATA[  and a.renliziyuan_delete >= #{params.renliziyuanDeleteStart}   ]]>
+            </if>
+            <if test="params.renliziyuanDeleteEnd != null and params.renliziyuanDeleteEnd != ''">
+                <![CDATA[  and a.renliziyuan_delete <= #{params.renliziyuanDeleteEnd}   ]]>
+            </if>
+             <if test="params.renliziyuanDelete != null and params.renliziyuanDelete != ''">
+                and a.renliziyuan_delete = #{params.renliziyuanDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

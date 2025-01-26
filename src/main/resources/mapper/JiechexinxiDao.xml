@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiechexinxiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jingche_id as jingcheId
+        ,a.yonghu_id as yonghuId
+        ,a.jiechexinxi_text as jiechexinxiText
+        ,a.jiechexinxi_time as jiechexinxiTime
+        ,a.jiechexinxi_num as jiechexinxiNum
+        ,a.jiechexinxi_yesno_types as jiechexinxiYesnoTypes
+        ,a.jiechexinxi_yesno_text as jiechexinxiYesnoText
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiechexinxiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,jingche.jingche_uuid_number as jingcheUuidNumber
+        ,jingche.jingche_name as jingcheName
+        ,jingche.jingche_types as jingcheTypes
+        ,jingche.status_types as statusTypes
+        ,jingche.jingche_content as jingcheContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_delete as yonghuDelete
+
+        FROM jiechexinxi  a
+        left JOIN jingche jingche ON a.jingche_id = jingche.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.jingcheId != null and params.jingcheId != ''">
+                and (
+                    a.jingche_id = #{params.jingcheId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.jiechexinxiText != '' and params.jiechexinxiText != null and params.jiechexinxiText != 'null' ">
+                and a.jiechexinxi_text like CONCAT('%',#{params.jiechexinxiText},'%')
+            </if>
+            <if test=" params.jiechexinxiTimeStart != '' and params.jiechexinxiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiechexinxi_time) >= UNIX_TIMESTAMP(#{params.jiechexinxiTimeStart}) ]]>
+            </if>
+            <if test=" params.jiechexinxiTimeEnd != '' and params.jiechexinxiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiechexinxi_time) <= UNIX_TIMESTAMP(#{params.jiechexinxiTimeEnd}) ]]>
+            </if>
+            <if test="params.jiechexinxiNumStart != null and params.jiechexinxiNumStart != ''">
+                <![CDATA[  and a.jiechexinxi_num >= #{params.jiechexinxiNumStart}   ]]>
+            </if>
+            <if test="params.jiechexinxiNumEnd != null and params.jiechexinxiNumEnd != ''">
+                <![CDATA[  and a.jiechexinxi_num <= #{params.jiechexinxiNumEnd}   ]]>
+            </if>
+             <if test="params.jiechexinxiNum != null and params.jiechexinxiNum != ''">
+                and a.jiechexinxi_num = #{params.jiechexinxiNum}
+             </if>
+            <if test="params.jiechexinxiYesnoTypes != null and params.jiechexinxiYesnoTypes != ''">
+                and a.jiechexinxi_yesno_types = #{params.jiechexinxiYesnoTypes}
+            </if>
+            <if test=" params.jiechexinxiYesnoText != '' and params.jiechexinxiYesnoText != null and params.jiechexinxiYesnoText != 'null' ">
+                and a.jiechexinxi_yesno_text like CONCAT('%',#{params.jiechexinxiYesnoText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断警车信息的id不为空 -->
+            <if test=" params.jingcheIdNotNull != '' and params.jingcheIdNotNull != null and params.jingcheIdNotNull != 'null' ">
+                and a.jingche_id IS NOT NULL
+            </if>
+            <if test=" params.jingcheUuidNumber != '' and params.jingcheUuidNumber != null and params.jingcheUuidNumber != 'null' ">
+                and jingche.jingche_uuid_number like CONCAT('%',#{params.jingcheUuidNumber},'%')
+            </if>
+            <if test=" params.jingcheName != '' and params.jingcheName != null and params.jingcheName != 'null' ">
+                and jingche.jingche_name like CONCAT('%',#{params.jingcheName},'%')
+            </if>
+            <if test="params.jingcheTypes != null  and params.jingcheTypes != ''">
+                and jingche.jingche_types = #{params.jingcheTypes}
+            </if>
+
+            <if test="params.statusTypes != null  and params.statusTypes != ''">
+                and jingche.status_types = #{params.statusTypes}
+            </if>
+
+            <if test=" params.jingcheContent != '' and params.jingcheContent != null and params.jingcheContent != 'null' ">
+                and jingche.jingche_content like CONCAT('%',#{params.jingcheContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jingche.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jingche.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断警员的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
